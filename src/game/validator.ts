@@ -10,11 +10,11 @@ export function validateWord(
 
   let word = '';
 
-  for (const { r, c } of path) {
-    if (r < 0 || r >= grid.length || c < 0 || c >= grid.length) {
+  for (const { row, col } of path) {
+    if (row < 0 || row >= grid.length || col < 0 || col >= grid.length) {
       return false;
     }
-    word += grid[r][c].toLowerCase();
+    word += grid[row][col].toLowerCase();
   }
 
   return trie.exists(word);

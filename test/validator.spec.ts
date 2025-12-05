@@ -17,19 +17,19 @@ function buildTrie() {
 describe('Word validator', () => {
   test('valid path CAT', () => {
     const trie = buildTrie();
-    const path = [{r:0,c:0}, {r:0,c:1}, {r:0,c:2}];
+    const path = [{row:0,col:0}, {row:0,col:1}, {row:0,col:2}];
     expect(validateWord(grid, path, trie)).toBe(true);
   });
 
   test('invalid non-adjacent', () => {
     const trie = buildTrie();
-    const path = [{r:0,c:0}, {r:0,c:2}];
+    const path = [{row:0,col:0}, {row:0,col:2}];
     expect(validateWord(grid, path, trie)).toBe(false);
   });
 
   test('invalid word not in Trie', () => {
     const trie = buildTrie();
-    const path = [{r:0,c:0}, {r:0,c:1}, {r:0,c:3}];
+    const path = [{row:0,col:0}, {row:0,col:1}, {row:0,col:3}];
     expect(validateWord(grid, path, trie)).toBe(false);
   });
 });

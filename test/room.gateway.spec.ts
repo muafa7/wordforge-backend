@@ -12,7 +12,6 @@ describe('RoomGateway (WebSocket)', () => {
   let client2: ClientSocket;
 
   beforeAll(async () => {
-    process.env.NODE_ENV = 'test'; // ensures deterministic grid
 
     const moduleRef = await Test.createTestingModule({
       imports: [AppModule],
@@ -37,7 +36,7 @@ describe('RoomGateway (WebSocket)', () => {
     return new Promise((resolve) => {
         const client = Client(`http://localhost:${port}/rooms`, {
         transports: ['websocket'],
-        auth: { playerName: name },   // 🔥 pass persistent identity
+        auth: { playerName: name },
         });
         client.on('connect', () => resolve(client));
     });
@@ -105,9 +104,9 @@ describe('RoomGateway (WebSocket)', () => {
                 client1.once('round_start', () => {
 
                 const path = [
-                    { r: 0, c: 0 },
-                    { r: 0, c: 1 },
-                    { r: 0, c: 2 },
+                    { row: 0, col: 0 },
+                    { row: 0, col: 1 },
+                    { row: 0, col: 2 },
                 ];
 
                 let updates = 0;

@@ -1,4 +1,4 @@
-export type Coord = { r: number; c: number };
+export type Coord = { row: number; col: number };
 
 export function generateGrid(n: number): string[][] {
   const alphabet = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
@@ -16,8 +16,8 @@ export function generateGrid(n: number): string[][] {
 }
 
 export function areNeighbors(a: Coord, b: Coord): boolean {
-  return Math.abs(a.r - b.r) <= 1 && Math.abs(a.c - b.c) <= 1 &&
-         !(a.r === b.r && a.c === b.c);
+  return Math.abs(a.row - b.row) <= 1 && Math.abs(a.col - b.col) <= 1 &&
+         !(a.row === b.row && a.col === b.col);
 }
 
 export function isAdjacent(path: Coord[]): boolean {
