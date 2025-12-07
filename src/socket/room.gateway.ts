@@ -130,7 +130,7 @@ export class RoomGateway implements OnGatewayConnection, OnGatewayDisconnect {
         roundDurationMs: 60000,
         submissions: [],
         usedByPlayer: {},
-        boardSize: 6,
+        boardSize: 4,
       };
       this.rooms.set(roomId, room);
     }
@@ -192,7 +192,7 @@ export class RoomGateway implements OnGatewayConnection, OnGatewayDisconnect {
     return Math.max(remaining, 0);
   }
 
-  private generateGrid(size = 6): string[][] {
+  private generateGrid(size = 4): string[][] {
     const rows = size;
     const cols = size;
     const letters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
