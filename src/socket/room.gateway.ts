@@ -336,7 +336,6 @@ export class RoomGateway implements OnGatewayConnection, OnGatewayDisconnect {
     room.submissions = [];
     room.players.forEach((p) => (p.score = 0));
 
-    // advanced: reset duplicates tracking each round
     room.usedByPlayer = {};
 
     const timeRemaining = this.getTimeRemaining(room);
@@ -399,7 +398,6 @@ export class RoomGateway implements OnGatewayConnection, OnGatewayDisconnect {
       return;
     }
 
-    // advanced: duplicates per player per round
     room.usedByPlayer[player.key] ??= new Set<string>();
     if (room.usedByPlayer[player.key].has(word)) {
       client.emit('word_rejected', {
@@ -497,7 +495,7 @@ export class RoomGateway implements OnGatewayConnection, OnGatewayDisconnect {
       return client.emit('error', { message: 'Only host can change settings' });
     }
 
-    // Disallow changes mid-round (simple rule)
+    // Disallow changes mid-round
     if (room.startAt && this.getTimeRemaining(room) > 0) {
       return client.emit('error', { message: 'Cannot change settings during an active round' });
     }
@@ -510,17 +508,14 @@ export class RoomGateway implements OnGatewayConnection, OnGatewayDisconnect {
     if (typeof data.boardSize === 'number') {
       const v = Math.max(4, Math.min(8, Math.floor(data.boardSize)));
       room.boardSize = v;
-      // optional: regenerate grid in lobby so people see new size immediately
       room.grid = [];
     }
 
-    // Tell everyone settings changed
     this.server.to(room.roomId).emit('room_settings', {
       roundDurationMs: room.roundDurationMs,
       boardSize: room.boardSize,
     });
 
-    // Also broadcast full state for safety
     this.broadcastRoomState(room);
     this.broadcastPlayerState(room);
   }
