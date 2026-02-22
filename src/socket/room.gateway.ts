@@ -14,6 +14,12 @@ import { validateWord } from '../game/validator';
 import words from 'word-list';
 import { readFileSync } from 'node:fs';
 import { scoreWord } from '../game/scoring';
+import { CreateRoomDto } from './dto/create-room.dto';
+import { JoinRoomDto } from './dto/join-room.dto';
+import { StartRoundDto } from './dto/start-round.dto';
+import { SubmitWordDto } from './dto/submit-word.dto';
+import { UpdateSettingsDto } from './dto/update-settings.dto';
+import { RoomActionDto } from './dto/room-action.dto';
 
 // Types
 type PlayerKey = string;
@@ -47,7 +53,7 @@ interface RoomState {
   roomId: string;
   hostKey: PlayerKey;
   players: Player[];
-  spectators: Spectator[]; 
+  spectators: Spectator[];
   grid: string[][];
   startAt?: number;
   roundDurationMs: number;
@@ -125,7 +131,7 @@ export class RoomGateway implements OnGatewayConnection, OnGatewayDisconnect {
         roomId,
         hostKey: '',
         players: [],
-        spectators: [], 
+        spectators: [],
         grid: [],
         roundDurationMs: 60000,
         submissions: [],
@@ -211,8 +217,7 @@ export class RoomGateway implements OnGatewayConnection, OnGatewayDisconnect {
   @SubscribeMessage('create_room')
   handleCreateRoom(
     @ConnectedSocket() client: Socket,
-    @MessageBody()
-    data: { roomId?: string; name: string; playerKey: string; roundDurationMs?: number },
+    @MessageBody() data: CreateRoomDto,
   ) {
     const roomId =
       data.roomId ?? Math.random().toString(36).substring(2, 8).toUpperCase();
@@ -257,7 +262,7 @@ export class RoomGateway implements OnGatewayConnection, OnGatewayDisconnect {
   @SubscribeMessage('join_room')
   handleJoinRoom(
     @ConnectedSocket() client: Socket,
-    @MessageBody() data: { roomId: string; name: string; playerKey?: string; role?: "player" | "spectator" },
+    @MessageBody() data: JoinRoomDto,
   ) {
     const room = this.getOrCreateRoom(data.roomId);
     client.join(room.roomId);
@@ -315,7 +320,7 @@ export class RoomGateway implements OnGatewayConnection, OnGatewayDisconnect {
   @SubscribeMessage('start_round')
   handleStartRound(
     @ConnectedSocket() client: Socket,
-    @MessageBody() data: { roomId: string },
+    @MessageBody() data: StartRoundDto,
   ) {
     const room = this.getRoom(data.roomId);
     if (!room) return client.emit('error', { message: 'Room not found' });
@@ -365,8 +370,7 @@ export class RoomGateway implements OnGatewayConnection, OnGatewayDisconnect {
   @SubscribeMessage('submit_word')
   handleSubmitWord(
     @ConnectedSocket() client: Socket,
-    @MessageBody()
-    data: { roomId: string; path: { row: number; col: number }[]; submissionId: string },
+    @MessageBody() data: SubmitWordDto,
   ) {
     const room = this.getRoom(data.roomId);
     if (!room) return client.emit('error', { message: 'Room not found' });
@@ -434,7 +438,7 @@ export class RoomGateway implements OnGatewayConnection, OnGatewayDisconnect {
   @SubscribeMessage('sync_state')
   handleSyncState(
     @ConnectedSocket() client: Socket,
-    @MessageBody() data: { roomId: string },
+    @MessageBody() data: RoomActionDto,
   ) {
     const room = this.getRoom(data.roomId);
     if (!room) return client.emit('error', { message: 'Room not found' });
@@ -458,7 +462,7 @@ export class RoomGateway implements OnGatewayConnection, OnGatewayDisconnect {
   @SubscribeMessage('leave_room')
   handleLeaveRoom(
     @ConnectedSocket() client: Socket,
-    @MessageBody() data: { roomId: string },
+    @MessageBody() data: RoomActionDto,
   ) {
     const room = this.getRoom(data.roomId);
     if (!room) return;
@@ -483,7 +487,7 @@ export class RoomGateway implements OnGatewayConnection, OnGatewayDisconnect {
   @SubscribeMessage('update_settings')
   handleUpdateSettings(
     @ConnectedSocket() client: Socket,
-    @MessageBody() data: { roomId: string; roundDurationMs?: number; boardSize?: number },
+    @MessageBody() data: UpdateSettingsDto,
   ) {
     const room = this.getRoom(data.roomId);
     if (!room) return client.emit('error', { message: 'Room not found' });
