@@ -9,6 +9,7 @@ import {
 } from '@nestjs/websockets';
 import { Injectable, Logger } from '@nestjs/common';
 import { Server, Socket } from 'socket.io';
+import { randomBytes } from 'node:crypto';
 import { Trie } from '../trie/trie';
 import { validateWord } from '../game/validator';
 import words from 'word-list';
@@ -235,7 +236,7 @@ export class RoomGateway implements OnGatewayConnection, OnGatewayDisconnect {
     @MessageBody() data: CreateRoomDto,
   ) {
     const roomId =
-      data.roomId ?? Math.random().toString(36).substring(2, 8).toUpperCase();
+      data.roomId ?? randomBytes(3).toString('hex').toUpperCase();
     const room = this.getOrCreateRoom(roomId);
 
     if (data.roundDurationMs) room.roundDurationMs = data.roundDurationMs;
