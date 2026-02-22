@@ -26,9 +26,4 @@ WordForge is a **real-time multiplayer word game** inspired by Boggle. Players t
 - Scoring based on word length and rarity  
 - Duplicate-word prevention  
 - Global round timer  
-- Automatic new-round generation  
-
-### 🛠️ Admin Tools
-- Dictionary management  
-- Active room monitoring  
-- Reset/maintenance controls  
+- Automatic new-round generation
