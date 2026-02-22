@@ -2,7 +2,10 @@ import { INestApplication } from '@nestjs/common';
 import { Test } from '@nestjs/testing';
 import { io as Client, Socket as ClientSocket } from 'socket.io-client';
 import { AppModule } from '../src/app.module';
+import { WORD_LIST } from '../src/config/word-list.token';
 import { AddressInfo } from 'net';
+
+const TEST_WORDS = ['cat', 'dog', 'bird', 'lion'];
 
 describe('RoomGateway (WebSocket)', () => {
   let app: INestApplication;
@@ -15,13 +18,17 @@ describe('RoomGateway (WebSocket)', () => {
 
     const moduleRef = await Test.createTestingModule({
       imports: [AppModule],
-    }).compile();
+    })
+      .overrideProvider(WORD_LIST)
+      .useValue(TEST_WORDS)
+      .compile();
 
     app = moduleRef.createNestApplication();
 
     const server = await app.listen(0);
     port = (server.address() as AddressInfo).port;
   });
+
 
   afterAll(async () => {
     await app.close();
@@ -34,13 +41,13 @@ describe('RoomGateway (WebSocket)', () => {
 
   function createClient(name: string): Promise<ClientSocket> {
     return new Promise((resolve) => {
-        const client = Client(`http://localhost:${port}/rooms`, {
+      const client = Client(`http://localhost:${port}/rooms`, {
         transports: ['websocket'],
         auth: { playerName: name },
-        });
-        client.on('connect', () => resolve(client));
+      });
+      client.on('connect', () => resolve(client));
     });
-  }  
+  }
 
 
   // Test 1: clients receive identical grid
@@ -86,51 +93,51 @@ describe('RoomGateway (WebSocket)', () => {
   });
 
   // Test 2: path submission triggers score_update on both clients
-    it('submitting a valid path results in score_update for both clients', async () => {
-        client1 = await createClient('Alice');
-        client2 = await createClient('Bob');
+  it('submitting a valid path results in score_update for both clients', async () => {
+    client1 = await createClient('Alice');
+    client2 = await createClient('Bob');
 
-        const roomId = 'ROOMTEST2';
+    const roomId = 'ROOMTEST2';
 
-        await new Promise<void>((resolve, reject) => {
-            client1.emit('create_room', { roomId, name: 'Alice' });
+    await new Promise<void>((resolve, reject) => {
+      client1.emit('create_room', { roomId, name: 'Alice' });
 
-            client1.once('room_created', () => {
-            client2.emit('join_room', { roomId, name: 'Bob' });
+      client1.once('room_created', () => {
+        client2.emit('join_room', { roomId, name: 'Bob' });
 
-            client2.once('joined_room', () => {
-                client1.emit('start_round', { roomId });
+        client2.once('joined_room', () => {
+          client1.emit('start_round', { roomId });
 
-                client1.once('round_start', () => {
+          client1.once('round_start', () => {
 
-                const path = [
-                    { row: 0, col: 0 },
-                    { row: 0, col: 1 },
-                    { row: 0, col: 2 },
-                ];
+            const path = [
+              { row: 0, col: 0 },
+              { row: 0, col: 1 },
+              { row: 0, col: 2 },
+            ];
 
-                let updates = 0;
+            let updates = 0;
 
-                const handler = (data: any) => {
-                    updates++;
-                    if (updates >= 2) {
-                    const alice = data.players.find((p: any) => p.name === 'Alice');
-                    expect(alice.score).toBe(3);
-                    resolve();
-                    }
-                };
+            const handler = (data: any) => {
+              updates++;
+              if (updates >= 2) {
+                const alice = data.players.find((p: any) => p.name === 'Alice');
+                expect(alice.score).toBe(3);
+                resolve();
+              }
+            };
 
-                client1.on('score_update', handler);
-                client2.on('score_update', handler);
+            client1.on('score_update', handler);
+            client2.on('score_update', handler);
 
-                client1.emit('submit_word', { roomId, path });
-                });
-            });
-            });
-
-            setTimeout(() => reject(new Error('timeout')), 8000);
+            client1.emit('submit_word', { roomId, path });
+          });
         });
+      });
+
+      setTimeout(() => reject(new Error('timeout')), 8000);
     });
+  });
 
   // Test 3: sync_state after reconnect
   it('sync_state restores current round state', async () => {

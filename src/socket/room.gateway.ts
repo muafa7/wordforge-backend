@@ -7,13 +7,12 @@ import {
   ConnectedSocket,
   MessageBody,
 } from '@nestjs/websockets';
-import { Injectable, Logger } from '@nestjs/common';
+import { Injectable, Logger, Inject } from '@nestjs/common';
 import { Server, Socket } from 'socket.io';
 import { randomBytes } from 'node:crypto';
 import { Trie } from '../trie/trie';
 import { validateWord } from '../game/validator';
-import words from 'word-list';
-import { readFileSync } from 'node:fs';
+import { generateGrid } from '../game/grid';
 import { scoreWord } from '../game/scoring';
 import { CreateRoomDto } from './dto/create-room.dto';
 import { JoinRoomDto } from './dto/join-room.dto';
@@ -22,6 +21,7 @@ import { SubmitWordDto } from './dto/submit-word.dto';
 import { UpdateSettingsDto } from './dto/update-settings.dto';
 import { RoomActionDto } from './dto/room-action.dto';
 import { ALLOWED_ORIGINS } from '../config/cors.config';
+import { WORD_LIST } from '../config/word-list.token';
 
 
 // Types
@@ -78,25 +78,8 @@ export class RoomGateway implements OnGatewayConnection, OnGatewayDisconnect {
   private readonly rooms = new Map<string, RoomState>();
   private readonly trie = new Trie();
 
-  constructor() {
-    const isTest = process.env.JEST_WORKER_ID !== undefined;
-
-    if (isTest) {
-      ['cat', 'dog', 'bird', 'lion'].forEach((w) => this.trie.insert(w));
-      this.generateGrid = () => [
-        ['C', 'A', 'T', 'X'],
-        ['D', 'O', 'G', 'X'],
-        ['B', 'I', 'R', 'D'],
-        ['L', 'I', 'O', 'N'],
-      ];
-    } else {
-      const text = readFileSync(words, 'utf8');
-      const list = text.split('\n');
-      const filtered = list.filter(
-        (w) => w.length >= 3 && w.length <= 5 && /^[a-z]+$/.test(w),
-      );
-      filtered.forEach((w) => this.trie.insert(w));
-    }
+  constructor(@Inject(WORD_LIST) wordList: string[]) {
+    wordList.forEach((w) => this.trie.insert(w));
   }
 
   handleConnection(client: Socket) {
@@ -214,20 +197,7 @@ export class RoomGateway implements OnGatewayConnection, OnGatewayDisconnect {
     return Math.max(remaining, 0);
   }
 
-  private generateGrid(size = 4): string[][] {
-    const rows = size;
-    const cols = size;
-    const letters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
-    const grid: string[][] = [];
-    for (let r = 0; r < rows; r++) {
-      const row: string[] = [];
-      for (let c = 0; c < cols; c++) {
-        row.push(letters[Math.floor(Math.random() * letters.length)]);
-      }
-      grid.push(row);
-    }
-    return grid;
-  }
+
 
   // Events
   @SubscribeMessage('create_room')
@@ -352,7 +322,7 @@ export class RoomGateway implements OnGatewayConnection, OnGatewayDisconnect {
       return client.emit('error', { message: 'Round already active' });
     }
 
-    room.grid = this.generateGrid(room.boardSize);
+    room.grid = generateGrid(room.boardSize);
     room.startAt = Date.now();
     room.submissions = [];
     room.players.forEach((p) => (p.score = 0));
