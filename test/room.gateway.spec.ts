@@ -170,4 +170,120 @@ describe('RoomGateway (WebSocket)', () => {
       setTimeout(() => reject(new Error('timeout')), 6000);
     });
   });
+
+  // Test 4: non-host cannot start round
+  it('non-host cannot start a round', async () => {
+    client1 = await createClient('Alice');
+    client2 = await createClient('Bob');
+    const roomId = 'ROOMTEST4';
+
+    await new Promise<void>((resolve, reject) => {
+      client1.emit('create_room', { roomId, name: 'Alice', playerKey: 'key-alice' });
+      client1.once('room_created', () => {
+        client2.emit('join_room', { roomId, name: 'Bob', playerKey: 'key-bob' });
+        client2.once('joined_room', () => {
+          client2.emit('start_round', { roomId });
+          client2.once('error', (err) => {
+            expect(err.message).toBe('Only host can start the round');
+            resolve();
+          });
+        });
+      });
+      setTimeout(() => reject(new Error('timeout')), 5000);
+    });
+  });
+
+  // Test 5: spectator cannot submit a word
+  it('spectator cannot submit a word', async () => {
+    client1 = await createClient('Alice');
+    client2 = await createClient('Bob');
+    const roomId = 'ROOMTEST5';
+
+    await new Promise<void>((resolve, reject) => {
+      client1.emit('create_room', { roomId, name: 'Alice', playerKey: 'key-alice' });
+      client1.once('room_created', () => {
+        client2.emit('join_room', { roomId, name: 'Bob', role: 'spectator' });
+        client2.once('joined_room', () => {
+          client1.emit('start_round', { roomId });
+          client1.once('round_start', () => {
+            client2.emit('submit_word', {
+              roomId,
+              submissionId: 'sub-spec',
+              path: [{ row: 0, col: 0 }, { row: 0, col: 1 }, { row: 0, col: 2 }],
+            });
+            client2.once('error', (err) => {
+              expect(err.message).toBe('Spectators cannot submit words');
+              resolve();
+            });
+          });
+        });
+      });
+      setTimeout(() => reject(new Error('timeout')), 6000);
+    });
+  });
+
+  // Test 6: duplicate word is rejected
+  it('submitting the same word twice yields a duplicate rejection', async () => {
+    client1 = await createClient('Alice');
+    const roomId = 'ROOMTEST6';
+
+    await new Promise<void>((resolve, reject) => {
+      client1.emit('create_room', { roomId, name: 'Alice', playerKey: 'key-alice' });
+      client1.once('room_created', () => {
+        client1.emit('start_round', { roomId });
+        client1.once('round_start', () => {
+          const path = [{ row: 0, col: 0 }, { row: 0, col: 1 }, { row: 0, col: 2 }];
+          client1.emit('submit_word', { roomId, submissionId: 'sub-1', path });
+          client1.once('score_update', () => {
+            client1.emit('submit_word', { roomId, submissionId: 'sub-2', path });
+            client1.once('word_rejected', (data) => {
+              expect(data.reason).toBe('duplicate');
+              resolve();
+            });
+          });
+        });
+      });
+      setTimeout(() => reject(new Error('timeout')), 6000);
+    });
+  });
+
+  // Test 7: round_end fires after the timer expires
+  it('round_end is emitted after roundDurationMs', async () => {
+    client1 = await createClient('Alice');
+    const roomId = 'ROOMTEST7';
+
+    await new Promise<void>((resolve, reject) => {
+      client1.emit('create_room', { roomId, name: 'Alice', playerKey: 'key-alice', roundDurationMs: 500 });
+      client1.once('room_created', () => {
+        client1.emit('start_round', { roomId });
+        client1.once('round_end', (data) => {
+          expect(data.roomId).toBe(roomId);
+          resolve();
+        });
+      });
+      setTimeout(() => reject(new Error('timeout')), 5000);
+    });
+  });
+
+  // Test 8: host transfers when host leaves
+  it('host transfers to next player when host leaves', async () => {
+    client1 = await createClient('Alice');
+    client2 = await createClient('Bob');
+    const roomId = 'ROOMTEST8';
+
+    await new Promise<void>((resolve, reject) => {
+      client1.emit('create_room', { roomId, name: 'Alice', playerKey: 'key-alice' });
+      client1.once('room_created', () => {
+        client2.emit('join_room', { roomId, name: 'Bob', playerKey: 'key-bob' });
+        client2.once('joined_room', () => {
+          client1.emit('leave_room', { roomId });
+          client2.once('player_state', (state) => {
+            expect(state.hostKey).toBe('key-bob');
+            resolve();
+          });
+        });
+      });
+      setTimeout(() => reject(new Error('timeout')), 5000);
+    });
+  });
 });

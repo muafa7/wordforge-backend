@@ -1,0 +1,344 @@
+﻿node.exe : PASS 
+test/trie.spec.ts
+At C:\Program Files\n
+odejs\npx.ps1:16 
+char:5
++     & 
+"$basedir/node$exe"  
+"$basedir/node_module
+s/npm/bin/npx-cli.js"
+ ...
++     ~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~
+    + CategoryInfo   
+           : NotSpe  
+  cified: (PASS te   
+ st/trie.spec.ts:    
+String) [], Remo    
+teException
+    + FullyQualified 
+   ErrorId : Native  
+  CommandError
+ 
+FAIL 
+test/scoring.spec.ts
+  ΓùÅ scoreWord ΓÇ║ 
+returns 0 for words 
+shorter than 3 
+letters
+
+    expect(received).
+toBe(expected) // 
+Object.is equality
+
+    Expected: 0
+    Received: 1
+
+    [0m [90m 3 
+|[39m describe([32m
+'scoreWord'[39m[33m
+,[39m () 
+[33m=>[39m {
+     [90m 4 |[39m  
+   
+test([32m'returns 0 
+for words shorter 
+than 3 letters'[39m
+[33m,[39m () 
+[33m=>[39m {
+    [31m[1m>[22m[
+39m[90m 5 |[39m    
+     expect(scoreWord
+([32m'ab'[39m))[33
+m.[39mtoBe([35m0[3
+9m)[33m;[39m
+     [90m   |[39m  
+                     
+          
+[31m[1m^[22m[39m
+     [90m 6 |[39m  
+       expect(scoreWo
+rd([32m'a'[39m))[3
+3m.[39mtoBe([35m0[
+39m)[33m;[39m
+     [90m 7 |[39m  
+   })[33m;[39m
+     [90m 8 
+|[39m[0m
+
+      at 
+Object.<anonymous> (t
+est/scoring.spec.ts:5
+:33)
+
+PASS test/validator.s
+pec.ts
+PASS src/app.controll
+er.spec.ts (5.705 s)
+FAIL test/room.gatewa
+y.spec.ts (32.494 s)
+  ΓùÅ RoomGateway 
+(WebSocket) ΓÇ║ two 
+clients join same 
+room and get 
+identical grid
+
+    thrown: 
+"Exceeded timeout of 
+5000 ms for a test.
+    Add a timeout 
+value to this test 
+to increase the 
+timeout, if this is 
+a long-running test. 
+See https://jestjs.io
+/docs/api#testname-fn
+-timeout."
+
+    [0m [90m 52 
+|[39m
+     [90m 53 |[39m 
+  [90m// Test 1: 
+clients receive 
+identical grid[39m
+    [31m[1m>[22m[
+39m[90m 54 |[39m   
+it([32m'two clients 
+join same room and 
+get identical grid'[
+39m[33m,[39m 
+[36masync[39m () 
+[33m=>[39m {
+     [90m    |[39m 
+  
+[31m[1m^[22m[39m
+     [90m 55 |[39m 
+    client1 
+[33m=[39m 
+[36mawait[39m creat
+eClient([32m'Alice'
+[39m)[33m;[39m
+     [90m 56 |[39m 
+    client2 
+[33m=[39m 
+[36mawait[39m creat
+eClient([32m'Bob'[3
+9m)[33m;[39m
+     [90m 57 
+|[39m[0m
+
+      at test/room.ga
+teway.spec.ts:54:3
+      at 
+Object.<anonymous> (t
+est/room.gateway.spec
+.ts:10:1)
+
+  ΓùÅ RoomGateway 
+(WebSocket) ΓÇ║ 
+submitting a valid 
+path results in 
+score_update for 
+both clients
+
+    thrown: 
+"Exceeded timeout of 
+5000 ms for a test.
+    Add a timeout 
+value to this test 
+to increase the 
+timeout, if this is 
+a long-running test. 
+See https://jestjs.io
+/docs/api#testname-fn
+-timeout."
+
+    [0m [90m 94 
+|[39m
+     [90m 95 |[39m 
+  [90m// Test 2: 
+path submission 
+triggers 
+score_update on both 
+clients[39m
+    [31m[1m>[22m[
+39m[90m 96 |[39m   
+it([32m'submitting 
+a valid path results 
+in score_update for 
+both clients'[39m[3
+3m,[39m 
+[36masync[39m () 
+[33m=>[39m {
+     [90m    |[39m 
+  
+[31m[1m^[22m[39m
+     [90m 97 |[39m 
+    client1 
+[33m=[39m 
+[36mawait[39m creat
+eClient([32m'Alice'
+[39m)[33m;[39m
+     [90m 98 |[39m 
+    client2 
+[33m=[39m 
+[36mawait[39m creat
+eClient([32m'Bob'[3
+9m)[33m;[39m
+     [90m 99 
+|[39m[0m
+
+      at test/room.ga
+teway.spec.ts:96:3
+      at 
+Object.<anonymous> (t
+est/room.gateway.spec
+.ts:10:1)
+
+  ΓùÅ RoomGateway 
+(WebSocket) ΓÇ║ 
+sync_state restores 
+current round state
+
+    thrown: 
+"Exceeded timeout of 
+5000 ms for a test.
+    Add a timeout 
+value to this test 
+to increase the 
+timeout, if this is 
+a long-running test. 
+See https://jestjs.io
+/docs/api#testname-fn
+-timeout."
+
+    [0m [90m 141 
+|[39m
+     [90m 142 
+|[39m   [90m// 
+Test 3: sync_state 
+after reconnect[39m
+    [31m[1m>[22m[
+39m[90m 143 |[39m  
+ it([32m'sync_state 
+restores current 
+round state'[39m[33
+m,[39m 
+[36masync[39m () 
+[33m=>[39m {
+     [90m     
+|[39m   
+[31m[1m^[22m[39m
+     [90m 144 
+|[39m     client1 
+[33m=[39m 
+[36mawait[39m creat
+eClient([32m'Alice'
+[39m)[33m;[39m
+     [90m 145 
+|[39m     
+[36mconst[39m 
+roomId [33m=[39m [
+32m'ROOMTEST3'[39m[
+33m;[39m
+     [90m 146 
+|[39m[0m
+
+      at test/room.ga
+teway.spec.ts:143:3
+      at 
+Object.<anonymous> (t
+est/room.gateway.spec
+.ts:10:1)
+
+  ΓùÅ RoomGateway 
+(WebSocket) ΓÇ║ 
+submitting the same 
+word twice yields a 
+duplicate rejection
+
+    thrown: 
+"Exceeded timeout of 
+5000 ms for a test.
+    Add a timeout 
+value to this test 
+to increase the 
+timeout, if this is 
+a long-running test. 
+See https://jestjs.io
+/docs/api#testname-fn
+-timeout."
+
+    [0m [90m 224 
+|[39m
+     [90m 225 
+|[39m   [90m// 
+Test 6: duplicate 
+word is rejected[39m
+    [31m[1m>[22m[
+39m[90m 226 |[39m  
+ it([32m'submitting 
+the same word twice 
+yields a duplicate re
+jection'[39m[33m,[
+39m [36masync[39m 
+() [33m=>[39m {
+     [90m     
+|[39m   
+[31m[1m^[22m[39m
+     [90m 227 
+|[39m     client1 
+[33m=[39m 
+[36mawait[39m creat
+eClient([32m'Alice'
+[39m)[33m;[39m
+     [90m 228 
+|[39m     
+[36mconst[39m 
+roomId [33m=[39m [
+32m'ROOMTEST6'[39m[
+33m;[39m
+     [90m 229 
+|[39m[0m
+
+      at test/room.ga
+teway.spec.ts:226:3
+      at 
+Object.<anonymous> (t
+est/room.gateway.spec
+.ts:10:1)
+
+A worker process has 
+failed to exit 
+gracefully and has 
+been force exited. 
+This is likely 
+caused by tests 
+leaking due to 
+improper teardown. 
+Try running with 
+--detectOpenHandles 
+to find leaks. 
+Active timers can 
+also cause this, 
+ensure that .unref() 
+was called on them.
+Test Suites: 2 
+failed, 3 passed, 5 
+total
+Tests:       5 
+failed, 18 passed, 
+23 total
+Snapshots:   0 total
+Time:        33.989 s
+Ran all test suites.
+Force exiting Jest: 
+Have you considered 
+using `--detectOpenHa
+ndles` to detect 
+async operations 
+that kept running 
+after all tests 
+finished?
