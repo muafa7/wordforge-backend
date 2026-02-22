@@ -121,7 +121,20 @@ export class RoomGateway implements OnGatewayConnection, OnGatewayDisconnect {
       if (player || spec) {
         this.broadcastRoomState(room);
         this.broadcastPlayerState(room);
+        this.cleanupRoomIfEmpty(room.roomId);
       }
+    }
+  }
+
+  private cleanupRoomIfEmpty(roomId: string): void {
+    const room = this.rooms.get(roomId);
+    if (!room) return;
+    const hasConnected =
+      room.players.some(p => p.connected) ||
+      room.spectators.some(s => s.connected);
+    if (!hasConnected) {
+      this.rooms.delete(roomId);
+      this.logger.log(`Room ${roomId} deleted (no connected participants)`);
     }
   }
 
@@ -365,6 +378,8 @@ export class RoomGateway implements OnGatewayConnection, OnGatewayDisconnect {
           submissions: room.submissions,
           players: this.snapshotPlayers(room),
         });
+        // Schedule room cleanup 5 minutes after round ends
+        setTimeout(() => this.cleanupRoomIfEmpty(room.roomId), 5 * 60 * 1000);
       }
     }, room.roundDurationMs + 50);
   }
