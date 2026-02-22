@@ -20,6 +20,8 @@ import { StartRoundDto } from './dto/start-round.dto';
 import { SubmitWordDto } from './dto/submit-word.dto';
 import { UpdateSettingsDto } from './dto/update-settings.dto';
 import { RoomActionDto } from './dto/room-action.dto';
+import { ALLOWED_ORIGINS } from '../config/cors.config';
+
 
 // Types
 type PlayerKey = string;
@@ -65,7 +67,7 @@ interface RoomState {
 @Injectable()
 @WebSocketGateway({
   namespace: '/rooms',
-  cors: { origin: '*' },
+  cors: { origin: ALLOWED_ORIGINS, credentials: true },
 })
 export class RoomGateway implements OnGatewayConnection, OnGatewayDisconnect {
   @WebSocketServer()

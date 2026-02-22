@@ -1,23 +1,21 @@
 import { NestFactory } from '@nestjs/core';
 import { ValidationPipe } from '@nestjs/common';
 import { AppModule } from './app.module';
+import { ALLOWED_ORIGINS } from './config/cors.config';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
 
   app.useGlobalPipes(
     new ValidationPipe({
-      whitelist: true,       // strip unknown properties
-      transform: true,       // auto-cast payloads to DTO types
-      forbidNonWhitelisted: false, // silently strip, don't error on extra fields
+      whitelist: true,
+      transform: true,
+      forbidNonWhitelisted: false,
     }),
   );
 
   app.enableCors({
-    origin: [
-      "https://wordforge-frontend.pages.dev",
-      "http://localhost:5173",
-    ],
+    origin: ALLOWED_ORIGINS,
     credentials: true,
   });
 
@@ -25,3 +23,4 @@ async function bootstrap() {
   await app.listen(port, '0.0.0.0');
 }
 bootstrap();
+
